@@ -2,12 +2,15 @@ package com.moviefinder;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -16,7 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -28,11 +33,12 @@ import com.moviefinder.Utilities.GlobalConfig;
 import com.moviefinder.Utilities.RequestCallback;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class HomeActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener {
 
     private int DEFAULT_PAGE_NUMBER = 1;
     private MenuItem item;
@@ -45,6 +51,8 @@ public class HomeActivity extends AppCompatActivity implements SearchView.OnQuer
     private Context context;
     private ArrayList<MovieModel> movieArrayList;
     private String queryString = "";
+    private TextView typeLabel, textViewWelcome;
+    private String typeText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,11 @@ public class HomeActivity extends AppCompatActivity implements SearchView.OnQuer
         progressBar = (ProgressBar) findViewById(R.id.progress_bar_movie_collection);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie_collection);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_movie_collection);
+        typeLabel = (TextView) findViewById(R.id.type_label);
+        textViewWelcome = (TextView) findViewById(R.id.text_view_welcome);
+        textViewWelcome.setVisibility(View.VISIBLE);
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linear_type);
+        linearLayout.setOnClickListener(this);
         context = HomeActivity.this;
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -93,6 +106,24 @@ public class HomeActivity extends AppCompatActivity implements SearchView.OnQuer
         sv.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         sv.setOnQueryTextListener(this);
+        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                queryString = "";
+                if (movieArrayList.size() > 0) {
+                    movieArrayList.clear();
+                }
+                textViewWelcome.setVisibility(View.VISIBLE);
+                typeLabel.setText(getString(R.string.type_text));
+                return true;  // Return true to collapse action view
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+
+                return true;  // Return true to expand action view
+            }
+        });
         return true;
     }
 
@@ -112,51 +143,62 @@ public class HomeActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void fireSearchAPICall(String query) {
+        if (!query.equals("")) {
+            textViewWelcome.setVisibility(View.GONE);
+            if (GlobalConfig.checkConnection(context, coordinatorLayout)) {
+                if (progressBar.getVisibility() == View.GONE)
+                    progressBar.setVisibility(View.VISIBLE);
 
-        if (GlobalConfig.checkConnection(context, coordinatorLayout)) {
-
-            if (progressBar.getVisibility() == View.GONE)
-                progressBar.setVisibility(View.VISIBLE);
-
-            query = query.replaceAll(" ", "%20");
-            String url = GlobalConfig.BASE_URL + "?t=" + query + "&plot=short";
-
-            JSONObject jsonObject = new JSONObject();
-
-            APIManager.jsonObjectVolleyRequest(context, url, "GET", jsonObject);
-            APIManager.setOnAPICallbackListener(new RequestCallback.APIRequestCallback() {
-                @Override
-                public void onSuccessResponse(String response) {
+                query = query.replaceAll(" ", "%20");
+                String url = GlobalConfig.BASE_URL + "?t=" + query + "&plot=short";
+                if (!typeText.equals("")) {
+                    url = url + "&type=" + typeText;
                 }
+                JSONObject jsonObject = new JSONObject();
 
-                @Override
-                public void onSuccessJSONResponse(JSONObject response) {
-                    if (progressBar.getVisibility() == View.VISIBLE)
-                        progressBar.setVisibility(View.GONE);
-
-                    if (response != null) {
-                        setMovieObjectToView(response);
-                    } else {
-                        GlobalConfig.showSnackBar("Not available", coordinatorLayout);
+                APIManager.jsonObjectVolleyRequest(context, url, "GET", jsonObject);
+                APIManager.setOnAPICallbackListener(new RequestCallback.APIRequestCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
                     }
-                }
 
-                @Override
-                public void onSuccessJSONArrayResponse(JSONArray response) {
+                    @Override
+                    public void onSuccessJSONResponse(JSONObject response) {
+                        if (progressBar.getVisibility() == View.VISIBLE)
+                            progressBar.setVisibility(View.GONE);
 
-                }
+                        try {
+                            if (response != null && !response.getString("Response").equalsIgnoreCase("false")) {
+                                if (response.has("Response") && !response.isNull("Response") && !response.getString("Response").equalsIgnoreCase("false")) {
+                                    setMovieObjectToView(response);
+                                }
+                            } else {
+                                GlobalConfig.showSnackBar("Not available", coordinatorLayout);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    if (progressBar.getVisibility() == View.VISIBLE)
-                        progressBar.setVisibility(View.GONE);
-                    APIManager.handleErrorResponseOfRequest(context, error, "Server Error", "SearchMovies");
-                }
+                    @Override
+                    public void onSuccessJSONArrayResponse(JSONArray response) {
 
-                @Override
-                public void statusCode(int statusCode) {
-                }
-            });
+                    }
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (progressBar.getVisibility() == View.VISIBLE)
+                            progressBar.setVisibility(View.GONE);
+                        APIManager.handleErrorResponseOfRequest(context, error, "Server Error", "SearchMovies");
+                    }
+
+                    @Override
+                    public void statusCode(int statusCode) {
+                    }
+                });
+            }
+        } else{
+            GlobalConfig.showSnackBar("Oops! Blank Search", coordinatorLayout);
         }
     }
 
@@ -230,5 +272,36 @@ public class HomeActivity extends AppCompatActivity implements SearchView.OnQuer
         }
 
         return ratingModelArrayList;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.linear_type:
+                sv.clearFocus();
+                showAlertDialogBox();
+                break;
+        }
+    }
+
+    private void showAlertDialogBox() {
+        final CharSequence types[] = new CharSequence[]{"Movie", "Series", "Episode"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select a type");
+        builder.setItems(types, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                typeLabel.setText(types[which].toString());
+                if (!queryString.equals("")) {
+                    if (movieArrayList.size() > 0) {
+                        movieArrayList.clear();
+                    }
+                    typeText = types[which].toString().toLowerCase();
+                    fireSearchAPICall(queryString);
+                }
+            }
+        });
+        builder.show();
     }
 }

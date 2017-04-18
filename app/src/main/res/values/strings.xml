@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MovieFinder</string>
     <string name="ratings_label">Ratings</string>
+    <string name="welcome_text">Movie Finder \n Please use the above search bar.</string>
+    <string name="type_text">Type</string>
+    <string name="title_home">Home</string>
 </resources>

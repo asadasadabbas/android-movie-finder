@@ -26,11 +26,10 @@ import java.util.ArrayList;
  * Created by training on 18/04/17.
  */
 
-public class MovieCollectionAdapter extends RecyclerView.Adapter<MovieCollectionAdapter.MyViewHolder> implements View.OnClickListener {
+public class MovieCollectionAdapter extends RecyclerView.Adapter<MovieCollectionAdapter.MyViewHolder> {
 
     private Context mContext;
     private ArrayList<MovieModel> movieList;
-    private String movieLabel = "";
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private ImageView thumbnailImage;
@@ -98,7 +97,7 @@ public class MovieCollectionAdapter extends RecyclerView.Adapter<MovieCollection
 
         ArrayList<RatingModel> arrayList = new ArrayList<RatingModel>();
         arrayList = movie.getRatings();
-        if (arrayList.size() > 0){
+        if (arrayList !=null && arrayList.size() > 0){
             for (int i =0;i<arrayList.size();i++){
                 if (i!=0){
                     ratingText = ratingText + "\n";
@@ -109,17 +108,6 @@ public class MovieCollectionAdapter extends RecyclerView.Adapter<MovieCollection
             }
         }
         holder.ratingContentView.setText(ratingText);
-
-//        holder.thumbnail.setOnClickListener(this); //Movie View OnClick
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-//            case R.id.thumbnail:
-
-//                break;
-        }
     }
 
     @Override

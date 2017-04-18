@@ -17,10 +17,6 @@ public class GlobalConfig {
 
     public static String BASE_URL = "http://www.omdbapi.com/";
 
-    //    ----------------------------Customer Section API----------------------------
-    public static String LOGIN_METHOD = "/customers/authenticate";
-    public static String FB_LOGIN_METHOD = "/customers/registerViaFacebook";
-
     public static void showSnackBar(String message, CoordinatorLayout coordinatorLayout) {
         final Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
         snackbar.setAction("Close", new View.OnClickListener() {
