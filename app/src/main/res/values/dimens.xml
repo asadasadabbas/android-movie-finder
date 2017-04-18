@@ -1,0 +1,39 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="padding_1dp">1dp</dimen>
+    <dimen name="padding_3dp">3dp</dimen>
+    <dimen name="padding_5dp">5dp</dimen>
+    <dimen name="padding_6dp">6dp</dimen>
+    <dimen name="padding_2dp">2dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_10dp">10dp</dimen>
+    <dimen name="padding_12dp">12dp</dimen>
+    <dimen name="padding_15dp">15dp</dimen>
+    <dimen name="padding_16dp">16dp</dimen>
+    <dimen name="padding_18dp">18dp</dimen>
+    <dimen name="padding_20dp">20dp</dimen>
+    <dimen name="padding_22dp">22dp</dimen>
+    <dimen name="padding_30dp">30dp</dimen>
+    <dimen name="padding_40dp">40dp</dimen>
+    <dimen name="padding_50dp">50dp</dimen>
+    <dimen name="padding_45dp">45dp</dimen>
+    <dimen name="padding_46dp">46dp</dimen>
+    <dimen name="padding_25dp">25dp</dimen>
+
+    <dimen name="font_2sp">2sp</dimen>
+    <dimen name="font_13sp">13sp</dimen>
+    <dimen name="font_12sp">12sp</dimen>
+    <dimen name="font_14sp">14sp</dimen>
+    <dimen name="font_15sp">15sp</dimen>
+    <dimen name="font_16sp">16sp</dimen>
+    <dimen name="font_17sp">17sp</dimen>
+    <dimen name="font_18sp">18sp</dimen>
+    <dimen name="font_20sp">20sp</dimen>
+    <dimen name="font_24sp">24sp</dimen>
+
+    <dimen name="card_elevation">3dp</dimen>
+    <dimen name="card_product_radius">0dp</dimen>
+</resources>
